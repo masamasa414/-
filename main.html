@@ -1,0 +1,195 @@
+<html>
+	<title>ブロック崩し</title>
+	<canvas id = "canvas" width = "725" height = "500" style = "background-color: #aaa"></canvas>
+	<script>
+		const canvas = document.getElementById("canvas");
+		const c = canvas.getContext("2d");
+
+		var x = 400
+		var	y = 400
+
+		var paddrex = 350;
+		var paddrey = 400;
+		var paddrewidth = 100;	
+		var paddreheight = 25;
+
+		var blockx = 10;
+		var blocky = 10;
+		var blockwidth = 170;
+		var blockheight = 30;
+		var block = 10;
+
+		var dx = 2;
+		var dy = -2;
+
+		var map = [];
+
+		for( var s = 0 ; s < 4 ; s ++ ){
+			map[s] = []
+			for( var r = 0 ; r < 4 ; r ++ ){
+				map[s][r] = {x: 0,y: 0,stetas: 1}
+			}
+		}
+
+		const draw = () => {
+			c.beginPath();
+			c.arc(x,y,10,0,Math.PI * 2,false)
+			c.fillStyle = "blue"
+			c.fill();
+			c.closePath();
+		};
+		const drawP = () => {
+			c.beginPath();
+			c.fillRect(paddrex,paddrey,paddrewidth,paddreheight)
+			c.fillStyle = "blue"
+			c.fill();
+			c.closePath();
+		};
+		const drawblock = () => {
+			for( s = 0 ; s < 4 ; s ++ ){	
+				for( r = 0 ; r < 4 ; r ++ ){
+					if( map[s][r].stetas == 1 ){
+						var blockx = (s * (blockwidth + block)) + 10;
+						var blocky = (r * (blockheight + block)) + 10;
+						map[s][r].x = blockx;
+						map[s][r].y = blocky;
+					
+						c.beginPath();
+						c.fillRect(blockx,blocky,blockwidth,blockheight);
+						c.fillStyle = "blue";
+						c.fill();
+						c.closePath();
+					}
+				}
+			}
+			blockx = 10;
+			blocky = 10;
+		};
+
+		var combo = 0;
+
+		const override = () => {
+			for( s = 0 ; s < 4 ; s ++ ){
+				for( r = 0 ; r < 4 ; r ++ ){
+					var b = map[s][r];	
+					if( sc >= 16 ){
+						gameclear = true;
+					}			
+					if( b.stetas == 1 ){
+						if( x > b.x && x < b.x + blockwidth && y > b.y && y < b.y + blockheight ){
+							dy = -dy
+							n = 0;
+							b.stetas = 0;
+							sc+=combo*10;
+							if( b.stetas == 0 ){	
+			  					if( x > b.x && x < b.x + blockwidth && y > b.y && y < b.y +	 blockheight ){	
+									if( n == 0 ){
+										sc++;
+											n++;
+									}
+								}
+							}				
+						}
+					}
+				}	
+			}
+		}
+
+		var i = 0;
+		var n = 0;
+		var sc = 0;
+
+		const score = () => {
+		    c.font = "16px Arial";
+		    c.fillStyle = "blue";
+		 	c.fillText("score:"+sc , 10, 490);
+		}
+
+		var leftkey = false;
+		var rightkey = false;
+
+		const key = () => {
+			window.addEventListener("keydown",function(event){
+				if( event.key == "ArrowRight" ){
+					rightkey = true;
+				}else if( event.key == "ArrowLeft" ){
+					leftkey = true
+				}
+			})
+			window.addEventListener("keyup",function(event){
+				if( event.key == "ArrowRight" ){
+					rightkey = false;
+				}else if( event.key == "ArrowLeft" ){
+					leftkey = false;
+				}
+			})
+		}
+		setInterval(key,100)
+
+		var gameover = false;
+		var gameclear = false
+
+		const clear = () => {
+			c.clearRect(0, 0, canvas.width, canvas.height);
+			if( gameclear == false ){
+				score();
+				draw();
+				drawP();
+				override();
+				drawblock();
+			}
+
+			if( gameover ){
+				clearInterval(clear,10);
+				gameover = false;
+				alert("gameover");
+			}else if( gameclear ){
+				clearInterval(clear,10);
+				gameclear = false;
+				alert("game clear!!");
+			}
+
+			if( x + dx > canvas.width - 5 || x + dx < 0 + 5 ){
+				dx = -dx;
+			}
+			if( y + dy < 0 + 5 || y + dy > canvas.height - 5 ){
+				if( y + dy > canvas.height - 5 ){
+					gameover = true;
+				}
+				dy = -dy;
+			}
+			if( y + dy > paddrey && y + dy < paddrey + paddreheight ){
+				if( x + dx > paddrex && x + dx < paddrex + paddrewidth ){
+					dy = -dy;
+					n = 0;
+				}
+			}
+
+			if( rightkey && paddrex <= canvas.width - paddrewidth ){
+				paddrex+=4;
+			}else if( leftkey && paddrex >= 0 ){
+				paddrex-=4;
+			}
+
+			x += dx;
+			y += dy;
+		}
+		setInterval(clear,10)
+
+		canvas.addEventListener("mousemove",function(e){
+			paddrex = e.pageX - paddrewidth / 2;
+		})
+	</script>
+	<br>
+	<h1>★ゲーム説明★</h1>
+	<br>
+	<h2>このゲームはhtml5とcanvasを用いて作ったゲームです</h2>
+	<h2>まず　操作説明です</h2>
+	<h2>パドルは矢印キーかマウスで動かします</h2>
+	<h2>そしたらパドルを動かしてボールに当ててうまくブロックを壊します</h2>
+	<h2>全部ブロックを消せたら勝ちです</h2>
+	<br>
+	<h2>--------------------------------------------</h2>
+	<br>
+	<a href="">このサイトのソースコード</a>
+</html>
